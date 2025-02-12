@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RIPEMD160 Private Key Finder</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        label {
+            display: block;
+            margin: 10px 0 5px;
+        }
+        input {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 15px;
+            box-sizing: border-box;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        #status {
+            margin-top: 20px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>RIPEMD160 Private Key Finder</h1>
+    <form id="keyFinderForm">
+        <label for="targetHash">Target RIPEMD160 Hash:</label>
+        <input type="text" id="targetHash" placeholder="Enter RIPEMD160 hash" required>
+
+        <label for="rangeStart">Start Range (Hex):</label>
+        <input type="text" id="rangeStart" value="0" placeholder="Enter start range in hex" required>
+
+        <label for="rangeEnd">End Range (Hex):</label>
+        <input type="text" id="rangeEnd" value="FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF" placeholder="Enter end range in hex" required>
+
+        <button type="button" id="startButton">Start Search</button>
+    </form>
+
+    <div id="status"></div>
+
+    <script>
+        const form = document.getElementById('keyFinderForm');
+        const startButton = document.getElementById('startButton');
+        const statusDiv = document.getElementById('status');
+        let worker;
+
+        startButton.addEventListener('click', () => {
+            const targetHash = document.getElementById('targetHash').value.trim();
+            const rangeStart = document.getElementById('rangeStart').value.trim();
+            const rangeEnd = document.getElementById('rangeEnd').value.trim();
+
+            if (!targetHash || !rangeStart || !rangeEnd) {
+                alert('Please fill in all fields.');
+                return;
+            }
+
+            // Terminate any existing worker
+            if (worker) {
+                worker.terminate();
+            }
+
+            // Initialize a new worker
+            worker = new Worker('worker.js');
+
+            worker.onmessage = (event) => {
+                const { type, message, privateKey } = event.data;
+
+                if (type === 'update') {
+                    statusDiv.textContent = message;
+                } else if (type === 'found') {
+                    statusDiv.innerHTML = `<span style="color: green;">Private Key Found:</span> ${privateKey}`;
+                    worker.terminate();
+                } else if (type === 'finished') {
+                    statusDiv.innerHTML = `<span style="color: red;">Search completed. No match found.</span>`;
+                }
+            };
+
+            worker.onerror = (error) => {
+                statusDiv.innerHTML = `<span style="color: red;">Error: ${error.message}</span>`;
+                worker.terminate();
+            };
+
+
+            worker.postMessage({ rangeStart, rangeEnd, targetHash });
+            statusDiv.textContent = 'Starting search...';
+        });
+    </script>
+</body>
+</html>
