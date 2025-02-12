@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Conversor Hexadecimal ↔ Decimal</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 50px;
+        }
+        input, button {
+            font-size: 18px;
+            padding: 10px;
+            margin: 10px;
+        }
+        #resultadoHex, #resultadoDec {
+            font-size: 20px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h2>Conversor Hexadecimal ↔ Decimal</h2>
+    
+    <h3>Hexadecimal para Decimal</h3>
+    <input type="text" id="hexInput" placeholder="Digite um número hexadecimal">
+    <button onclick="converterParaDecimal()">Converter</button>
+    <p id="resultadoDec"></p>
+    
+    <h3>Decimal para Hexadecimal</h3>
+    <input type="text" id="decInput" placeholder="Digite um número decimal">
+    <button onclick="converterParaHex()">Converter</button>
+    <p id="resultadoHex"></p>
+
+    <script>
+        function converterParaDecimal() {
+            let hex = document.getElementById("hexInput").value;
+            if (/^[0-9a-fA-F]+$/.test(hex)) {
+                let decimal = BigInt("0x" + hex).toString();
+                document.getElementById("resultadoDec").innerText = "Decimal: " + decimal;
+            } else {
+                document.getElementById("resultadoDec").innerText = "Entrada inválida! Insira um número hexadecimal válido.";
+            }
+        }
+        
+        function converterParaHex() {
+            let decimal = document.getElementById("decInput").value;
+            if (/^\d+$/.test(decimal)) {
+                let hex = BigInt(decimal).toString(16).toUpperCase();
+                document.getElementById("resultadoHex").innerText = "Hexadecimal: " + hex;
+            } else {
+                document.getElementById("resultadoHex").innerText = "Entrada inválida! Insira um número decimal válido.";
+            }
+        }
+    </script>
+</body>
+</html>
