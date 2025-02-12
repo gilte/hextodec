@@ -89,6 +89,9 @@
             <label for="rangeEnd">End Range (Hex):</label>
             <input type="text" id="rangeEnd" value="FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF" placeholder="Enter end range in hex" required>
 
+            <label for="step">Step (Hex):</label>
+            <input type="text" id="step" value="1" placeholder="Enter step in hex" required>
+
             <button type="button" id="startButton">Start Search</button>
         </form>
 
@@ -96,6 +99,7 @@
 
         <a href="slave.html" class="link-button">Hex to Dec Converter</a>
     </div>
+    <body>
 
     <script>
         const form = document.getElementById('keyFinderForm');
@@ -107,8 +111,9 @@
             const targetHash = document.getElementById('targetHash').value.trim();
             const rangeStart = document.getElementById('rangeStart').value.trim();
             const rangeEnd = document.getElementById('rangeEnd').value.trim();
+            const step = document.getElementById('step').value.trim(); // Obtém o valor de 'step'
 
-            if (!targetHash || !rangeStart || !rangeEnd) {
+            if (!targetHash || !rangeStart || !rangeEnd || !step) {
                 alert('Please fill in all fields.');
                 return;
             }
@@ -133,9 +138,10 @@
                 worker.terminate();
             };
 
-            worker.postMessage({ rangeStart, rangeEnd, targetHash });
+            worker.postMessage({ rangeStart, rangeEnd, targetHash, step }); // Envia o 'step' junto com as outras variáveis
             statusDiv.textContent = 'Starting search...';
         });
     </script>
 </body>
+
 </html>
